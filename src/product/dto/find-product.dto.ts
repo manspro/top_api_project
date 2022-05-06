@@ -1,4 +1,4 @@
-export class FindProductDto{
-  category:string;
-  limit:string;
+export class FindProductDto {
+	category: string;
+	limit: number;
 }
