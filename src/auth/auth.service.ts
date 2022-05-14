@@ -5,15 +5,17 @@ import { UserModel } from './user.model';
 import { ModelType } from '@typegoose/typegoose/lib/types';
 import { genSalt, hash, compare } from 'bcryptjs';
 import { USER_NOR_FOUND_ERROR, WRONG_PASSWORD_ERROR } from './auth.constants';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel(UserModel) private readonly userModel: ModelType<UserModel>,
+    private readonly jwtService: JwtService,
   ) {}
 
   async createUser(dto: AuthDto) {
-    const salt = genSalt(10);
+    const salt = await genSalt(10);
     const newUser = new this.userModel({
       login: dto.login,
       passwordHash: await hash(dto.password, salt),
@@ -38,5 +40,12 @@ export class AuthService {
       throw new UnauthorizedException(WRONG_PASSWORD_ERROR);
     }
     return { email: user.email };
+  }
+
+  async login(email: string) {
+    const payload = { email };
+    return {
+      access_token: await this.jwtService.signAsync(payload),
+    };
   }
 }
