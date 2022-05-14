@@ -3,8 +3,8 @@ import { AuthDto } from './dto/auth.dto';
 import { InjectModel } from 'nestjs-typegoose';
 import { UserModel } from './user.model';
 import { ModelType } from '@typegoose/typegoose/lib/types';
-import { genSaltSync, hashSync } from 'bcryptjs';
-import { USER_NOR_FOUND_ERROR } from './auth.constants';
+import { genSalt, hash, compare } from 'bcryptjs';
+import { USER_NOR_FOUND_ERROR, WRONG_PASSWORD_ERROR } from './auth.constants';
 
 @Injectable()
 export class AuthService {
@@ -13,10 +13,10 @@ export class AuthService {
   ) {}
 
   async createUser(dto: AuthDto) {
-    const salt = genSaltSync(10);
+    const salt = genSalt(10);
     const newUser = new this.userModel({
       login: dto.login,
-      passwordHash: hashSync(dto.password, salt),
+      passwordHash: await hash(dto.password, salt),
     });
     return newUser.save();
   }
@@ -25,10 +25,18 @@ export class AuthService {
     return this.userModel.findOne({ email }).exec();
   }
 
-  async validateUser(email: string, password: string) {
+  async validateUser(
+    email: string,
+    password: string,
+  ): Promise<Pick<UserModel, 'email'>> {
     const user = await this.findUser(email);
     if (!user) {
       throw new UnauthorizedException(USER_NOR_FOUND_ERROR);
     }
+    const isCorrectPassword = await compare(password, user.passwordHash);
+    if (!isCorrectPassword) {
+      throw new UnauthorizedException(WRONG_PASSWORD_ERROR);
+    }
+    return { email: user.email };
   }
 }
