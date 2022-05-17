@@ -1,9 +1,14 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
   HttpCode,
+  HttpException,
+  HttpStatus,
+  Next,
+  NotFoundException,
   Param,
   Patch,
   Post,
@@ -19,14 +24,25 @@ export class ProductController {
 
   @Post('create')
   async create(@Body() dto: CreateProductDto) {
-    return this.productService.create(dto);
+    return await this.productService.create(dto);
   }
 
   @Get(':id')
-  async get(@Param('id') id: string) {}
+  async get(@Param('id') id: string) {
+    const product = await this.productService.findById(id);
+    if (!product) {
+      throw new NotFoundException(PRODUCT_NOT_FOUND_ERROR);
+    }
+    return product;
+  }
 
   @Delete(':id')
-  async delete(@Param('id') id: string) {}
+  async delete(@Param('id') id: string) {
+    const deleteProduct = await this.productService.deleteById(id);
+    if (!deleteProduct) {
+      throw new NotFoundException(PRODUCT_NOT_FOUND_ERROR);
+    }
+  }
 
   @Patch(':id')
   async patch(@Param('id') id: string, @Body() dto: ProductModel) {}

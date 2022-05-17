@@ -14,4 +14,12 @@ export class ProductService {
   async create(dto: CreateProductDto) {
     return this.productModel.create(dto);
   }
+
+  async findById(id: string) {
+    return this.productModel.findById(id).exec();
+  }
+
+  async deleteById(id: string) {
+    return this.productModel.findByIdAndDelete(id).exec();
+  }
 }
