@@ -1,8 +1,5 @@
-import { prop } from '@typegoose/typegoose';
-import { Base, TimeStamps } from '@typegoose/typegoose/lib/defaultClasses';
 import { TopLevelCategory } from '../top-page.model';
 import {
-  IsAlpha,
   IsArray,
   IsEnum,
   IsNumber,
