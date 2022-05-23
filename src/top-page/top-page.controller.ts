@@ -36,7 +36,12 @@ export class TopPageController {
   }
 
   @Delete(':id')
-  async delete(@Param('id') id: string) {}
+  async delete(@Param('id') id: string) {
+    const deletedPage = await this.topPageService.deleteById(id);
+    if (!deletedPage) {
+      throw new NotFoundException(NOT_FOUND_TOP_PAGE_ERROR);
+    }
+  }
 
   @Patch(':id')
   async patch(@Param('id') id: string, @Body() dto: TopPageModel) {}
