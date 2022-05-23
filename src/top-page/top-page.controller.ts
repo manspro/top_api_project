@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   HttpCode,
+  NotFoundException,
   Param,
   Patch,
   Post,
@@ -12,6 +13,9 @@ import { FindTopPageDto } from './dto/find-top-page.dto';
 import { TopPageModel } from './top-page.model';
 import { TopPageService } from './top-page.service';
 import { CreateTopPage } from './dto/create-top-page.dto';
+import { IdValidationPipe } from '../pipes/ad-validation.pipe';
+import * as stream from 'stream';
+import { NOT_FOUND_TOP_PAGE_ERROR } from './top-page.constants';
 
 @Controller('top-page')
 export class TopPageController {
@@ -23,7 +27,13 @@ export class TopPageController {
   }
 
   @Get(':id')
-  async get(@Param('id') id: string) {}
+  async get(@Param('id', IdValidationPipe) id: string) {
+    const page = await this.topPageService.findById(id);
+    if (!page) {
+      throw new NotFoundException(NOT_FOUND_TOP_PAGE_ERROR);
+    }
+    return page;
+  }
 
   @Delete(':id')
   async delete(@Param('id') id: string) {}
