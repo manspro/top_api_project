@@ -8,6 +8,8 @@ import {
   Param,
   Patch,
   Post,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { FindTopPageDto } from './dto/find-top-page.dto';
 import { TopPageService } from './top-page.service';
@@ -59,7 +61,10 @@ export class TopPageController {
     return updatedPage;
   }
 
+  @UsePipes(new ValidationPipe())
   @HttpCode(200)
-  @Post()
-  async find(@Body() dto: FindTopPageDto) {}
+  @Post('find')
+  async find(@Body() dto: FindTopPageDto) {
+    return this.topPageService.findByCategory(dto.firstCategory);
+  }
 }
