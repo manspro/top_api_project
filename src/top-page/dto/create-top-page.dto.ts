@@ -29,9 +29,6 @@ export class TopPageAdvantageDto {
 
   @IsString()
   description: string;
-
-  @IsString()
-  author: string;
 }
 
 export class CreateTopPageDto {
