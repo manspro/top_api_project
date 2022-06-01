@@ -20,7 +20,16 @@ export class TopPageService {
   }
 
   async findByAlias(alias: string) {
-    return this.topPageModel.findOne({ alias }).exec();
+    return this.topPageModel
+        .aggregate()
+        .match({
+
+               firstCategory
+        })
+        .group({
+          _id:{secondCategory:'$secondCategory'},
+          pages:{$push :{alias: '$alias', title:'$title'}}}).exec();
+
   }
 
   async findByCategory(firstCategory: TopLevelCategory) {
